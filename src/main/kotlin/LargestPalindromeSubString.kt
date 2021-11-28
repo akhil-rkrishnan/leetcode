@@ -1,8 +1,46 @@
 fun main() {
-    println(LargestPalindromeSubString().longestPalindrome("bacabab"))
+    println(LargestPalindromeSubString().longestPalindrome("abcabcb"))
+    println(LargestPalindromeSubString().longestPalindrome("xaabacxcabaaxcabaax"))
+    println(LargestPalindromeSubString().longestPalindrome("babad"))
+    println(LargestPalindromeSubString().longestPalindrome("ab"))
+    println(LargestPalindromeSubString().longestPalindrome("aaaaaaa"))
+    println(LargestPalindromeSubString().longestPalindrome("x"))
 }
 
 class LargestPalindromeSubString {
+    fun longestPalindromeWithHashMap(s: String): String {
+        var largestIndex = 1
+        var largestSubstring = s.get(0).toString()
+        val hashMap = HashMap<Char, ArrayList<Int>>()
+        s.forEachIndexed { index, char ->
+            val getList = hashMap.get(char)
+            if (getList == null) {
+                hashMap.put(char, ArrayList<Int>().apply {
+                    add(index)
+                })
+            } else {
+                getList.add(index)
+                hashMap.put(char, getList)
+            }
+        }
+        hashMap.forEach { char, arrayList ->
+            val listSize = arrayList.size
+            if (listSize != 1) {
+                for (startIndex in 0..listSize - 1) {
+                    for (endIndex in (startIndex + 1)..listSize - 1) {
+                        val newStr = s.substring(arrayList.get(startIndex), arrayList.get(endIndex) + 1)
+                        if (newStr.reversed().equals(newStr)) {
+                            if (newStr.length > largestIndex) {
+                                largestIndex = newStr.length
+                                largestSubstring = newStr
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return largestSubstring
+    }
 
     fun longestPalindrome(s: String): String {
 
@@ -19,39 +57,8 @@ class LargestPalindromeSubString {
         } else if (checkAllSame(s) || s.reversed().equals(s)) {
             return s
         } else {
-            return theLargestSubstring(s)
+            return longestPalindromeWithHashMap(s)
         }
-    }
-
-    fun theLargestSubstring(s: String): String {
-        var i = 0
-        val length = s.length
-        var palindromeSubString = ""
-        var largestLength = 0
-        while (i < length) {
-            val ch = s.get(i).toString()  //"aacabdkacaa"
-            if (largestLength == 0) {
-                palindromeSubString += ch
-                largestLength = 1
-            }
-            if ((i + 1) != length) {
-                var splitString = s.substring(i + 1, length)
-                val indexOfRepeat = splitString.indexOf(ch)
-                if (indexOfRepeat != -1) {
-                    splitString = splitString.substring(0, indexOfRepeat + 1)
-                    splitString = ch + splitString
-                    val reversed = splitString.reversed()
-                    if (splitString.equals(reversed)) {
-                        if (splitString.length > largestLength) {
-                            largestLength = splitString.length
-                            palindromeSubString = splitString
-                        }
-                    }
-                }
-            }
-            i++
-        }
-        return palindromeSubString
     }
 
     fun checkAllSame(s: String): Boolean {
