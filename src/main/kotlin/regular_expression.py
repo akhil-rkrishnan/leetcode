@@ -1,42 +1,52 @@
 
 from linecache import checkcache
+import re
 
 
-def allCharactersSame(s, checkChar) :
-    n = len(s)
-    for i in range(1, n) :
-        if s[i] != checkChar :
-            return False
-    return True
-
-def isSatisfiedRegularExpression(checkString, pattern):
+def isSatisfiedRegularExpression(p, s):
     
-    if (checkString == pattern):
-        return True
-    elif (pattern == ".*"):
-        return True
-    else:
-        stringLength = len(checkString)
-        patternLength = len(pattern)
-        if (patternLength > stringLength):
-            return False
+    k = 0; j = 0
+    pLen = len(p); sLen = len(s)
+    passed = True
+    if (p == ".*"):
+        return passed
+    if (p.find("*") == -1):
+        if (p != s):
+            return not passed
+
+    while (k < pLen):
+
+        if (j < sLen and p[k] == s[j]):
+            k = k + 1; j = j + 1
+        elif (p[k] == "*"):
+            c = p[k-1]
+            if (j == sLen):
+                break
+            while (j < sLen):
+                if (s[j] == c):
+                    j = j + 1
+                elif(k + 1 < pLen and (p[k + 1] == s[j] or p[k + 1] == ".")):
+                    k = k + 2; j = j + 1; break
+                elif (k + 1 < pLen and p[k + 1] == "*"):
+                    k = k + 1; j = j + 1; break
+                else:
+                    print("IN-1")
+                    passed = False
+                    k = pLen
+                    break      
+        elif(k + 1 < pLen and p[k + 1] == "*"):
+            k = k + 2
+            
+        # elif(k + 1 < pLen and p[k + 1] == "."):
+        #     k = k + 1
         else:
-            if (pattern.find("*") != -1):
-              splitString = pattern.split("*")[0]
-              splitStringLen = len(splitString)
-              if (splitStringLen == 1 and stringLength > 1):
-                return allCharactersSame(checkString, splitString) 
-              else:
-                  if(checkString.startswith(splitString)):
-                      splitSecond = checkString.split(splitString)[1]
-                      if (splitSecond == ''):
-                          return True
-                      else:
-                          return allCharactersSame(splitSecond,splitSecond[0])
-            else:
-                return False
-                
+            passed = False   
+            print("IN-2")         
+            break
+   
+    return passed
+        
+string = "abcd"
+pattern = "f*"             
 
-print("aab,cc,dd".split("aab,cc"))
-
-print(isSatisfiedRegularExpression("aabbbbbc", "aab*"))
+print(isSatisfiedRegularExpression(pattern, string))
