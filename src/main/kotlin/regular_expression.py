@@ -1,32 +1,33 @@
 
-from linecache import checkcache
-import re
 
-
-def isSatisfiedRegularExpression(p, s):
+def isSatisfiedRegularExpression(s, p):
     
     k = 0; j = 0
     pLen = len(p); sLen = len(s)
     passed = True
-    if (p == ".*"):
+    
+    if (p == ".*" or p == ""):
         return passed
     if (p.find("*") == -1 and p.find(".") == -1):
         if (p != s):
             return not passed
+
     c = ""
     while (k < pLen):
 
         if (j < sLen and (p[k] == s[j] or p[k] == ".")):
+            print("IN-M")
             k = k + 1; j = j + 1
         elif (p[k] == "*"):
             c = p[k-1]
             if (j == sLen):
                 k = k + 1
-                # break
-            
+                print("Recursion")
+                return isSatisfiedRegularExpression(s[j - 1], p[k:])
             while (j < sLen):
                 if (s[j] == c or c == "."):
                     j = j + 1
+                    
                 elif(k + 1 < pLen and (p[k + 1] == s[j] or p[k + 1] == ".")):
                     k = k + 2; j = j + 1; break
                 elif (k + 1 < pLen and p[k + 1] == "*"):
@@ -40,22 +41,37 @@ def isSatisfiedRegularExpression(p, s):
         elif(k + 1 < pLen and p[k + 1] == "*"):
             k = k + 2
         
-        elif (p[k] == c):
+        elif (p[k] == c or p[k] == "."):
             k = k + 1
 
         else:
             passed = False   
+            k = k + 1
             print("IN-2")         
             break
 
     if (j != sLen):
         passed = False
         print("IN-3")
-
+       
     return passed
 
-string = "bbbba"
-pattern = ".*a*a"      
+string = "a"
+pattern = ".*..a*"
+
+#True
+# string = "ab"
+# pattern = ".*..c*"
+
+# True
+# string = "ab"
+# pattern = ".*.."
+
+# string = "aaa"
+# pattern = "ab*ac*a"
+
+# string = "bbbba"
+# pattern = ".*a*a"      
 
 # string = "aaa"
 # pattern = "a*a" 
@@ -66,4 +82,4 @@ pattern = ".*a*a"
 # string = "aa"
 # pattern = "a*"
 
-print(isSatisfiedRegularExpression(pattern, string))
+print(isSatisfiedRegularExpression(string, pattern))
